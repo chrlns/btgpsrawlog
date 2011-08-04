@@ -1,6 +1,6 @@
 /*
  *   BTGPSRawLog
- *   Copyright (C) 2010 Christian Lins <christian.lins@fh-osnabrueck.de>
+ *   Copyright (C) 2010-2011 Christian Lins <christian@lins.me>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -15,62 +15,71 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package btgpsrawlog.forms;
 
-import btgpsrawlog.BTGPSRawLogMidlet;
 import btgpsrawlog.RawLogger;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.CommandListener;
-import javax.microedition.lcdui.Display;
-import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Form;
+import javax.microedition.lcdui.Spacer;
+import javax.microedition.lcdui.StringItem;
 
 /**
- *
+ * Logging status form.
  * @author Christian Lins
  */
-public class LoggerForm extends Form implements CommandListener
-{
+public class LoggerForm extends Form {
+
+	public static final Command START = new Command("Start", null, Command.OK, 0);
+	public static final Command STOP = new Command("Stop", null, Command.CANCEL, 0);
+
+	private static final String MSG = "\nPress Start to finally start logging GPS data!";
 
 	private RawLogger logger;
-	private Command startCommand = new Command("Start", null, Command.OK, 1);
-	private Command stopCommand  = new Command("Stop", null, Command.CANCEL, 0);
+	private Timer timer = new Timer();
 
-	public LoggerForm(RawLogger logger)
-	{
+	public LoggerForm() {
 		super("GPS Status");
+
+		init();
+	}
+
+	private void init() {
+		deleteAll();
+		removeCommand(STOP);
+		addCommand(START);
+	}
+
+	public RawLogger getLogger() {
+		return this.logger;
+	}
+
+	public void setLogger(RawLogger logger) {
+		init();
+
 		this.logger = logger;
 		this.logger.setOutputForm(this);
-		append("BTURL: " + logger.getURL());
+		
+		append(new StringItem(null, "Device: " + logger.getDeviceName()));
+		append(new Spacer(10, 5));
+		append(MSG);
 
-		addCommand(stopCommand);
-		addCommand(startCommand);
-
-		setCommandListener(this);
-	}
-
-	public void commandAction(Command cmd, Displayable disp)
-	{
-		if(cmd.equals(this.startCommand))
-		{
-			try
-			{
-				this.logger.connect();
-				this.logger.start();
-				append("Logging started");
+		this.timer.schedule(new TimerTask() {
+			public void run() {
+				int bytes = getLogger().bytesRead();
+				StringItem item;
+				if(bytes == 0) {
+					item = new StringItem(null, MSG);
+				} else if( bytes < 10000) {
+					item = new StringItem(null, "\nData read: " + bytes + " bytes");
+				} else {
+					item = new StringItem(null, "\nData read: " + (bytes / 1000) + " kbytes");
+				}
+				item.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+				set(2, item);
 			}
-			catch(Exception ex)
-			{
-				append(ex.getMessage());
-				ex.printStackTrace();
-			}
-		}
-		else if(cmd.equals(this.stopCommand))
-		{
-			this.logger.disconnect();
-			Display.getDisplay(BTGPSRawLogMidlet.getInstance()).setCurrent(new MainForm());
-		}
+		}, 1000, 500);
 	}
-	
 }

@@ -19,31 +19,25 @@ package btgpsrawlog.forms;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Form;
-import javax.microedition.lcdui.Spacer;
+import javax.microedition.lcdui.StringItem;
+import javax.microedition.midlet.MIDlet;
 
 /**
- * Main form of the app.
- * @author Christian Lins
+ *
+ * @author Christian
  */
-public class MainForm extends Form {
+public class AboutForm extends Form {
 
-	public static final Command EXIT = new Command("Exit", null, Command.EXIT, 0);
-	public static final Command START = new Command("Continue", null, Command.OK, 1);
-	public static final Command ABOUT = new Command("About", null, Command.HELP, 0);
-
-	private static final String MSG =
-			"Press Continue to select a bluetooth GPS device, " +
-			"choose a location to save the NMEA log and " +
-			"start walking around to collect data!";
-
-	public MainForm() {
-		super("Bluetooth GPS Logger");
-
-		append(new Spacer(getWidth(), 10));
-		append(MSG);
-
-		addCommand(EXIT);
-		addCommand(START);
-		addCommand(ABOUT);
+	public static final Command BACK = new Command("Back", null, Command.BACK, 0);
+	
+	public AboutForm(MIDlet midlet) {
+		super("About");
+		
+		append(new StringItem("Name", midlet.getAppProperty("MIDlet-Name")));
+		append(new StringItem("Version", midlet.getAppProperty("MIDlet-Version")));
+		append(new StringItem("Author", midlet.getAppProperty("MIDlet-Vendor")));
+		
+		addCommand(BACK);
 	}
+
 }
