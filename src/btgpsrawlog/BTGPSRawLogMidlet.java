@@ -36,18 +36,17 @@ import btgpsrawlog.forms.SaveLogForm;
  */
 public class BTGPSRawLogMidlet extends MIDlet {
 
-    protected Displayable     currentDisplay;
-    protected EventController eventController;
-    protected RawLogger       rawLogger   = null;
+    protected Displayable         currentDisplay;
+    protected EventController     eventController;
+    protected RawLogger           rawLogger   = null;
 
-    protected AboutForm       aboutForm   = new AboutForm(this);
-    protected LoggerForm      loggerForm  = new LoggerForm();
-    protected MainForm        mainForm    = new MainForm();
-    protected SaveLogForm     saveLogForm = new SaveLogForm();
+    protected AboutForm           aboutForm   = new AboutForm(this);
+    protected BluetoothDeviceList btDevList   = new BluetoothDeviceList(this);
+    protected LoggerForm          loggerForm  = new LoggerForm();
+    protected MainForm            mainForm    = new MainForm();
+    protected SaveLogForm         saveLogForm = new SaveLogForm();
 
     public BTGPSRawLogMidlet() {
-        BluetoothDeviceList btDevList = new BluetoothDeviceList(this);
-
         this.eventController = new EventController(this);
         btDevList.setCommandListener(new BluetoothDeviceListController(btDevList, this));
         loggerForm.setCommandListener(eventController);
@@ -94,6 +93,10 @@ public class BTGPSRawLogMidlet extends MIDlet {
 
     public void showAboutForm() {
         Display.getDisplay(this).setCurrent(this.aboutForm);
+    }
+
+    public void showBluetoothDeviceList() {
+        Display.getDisplay(this).setCurrent(this.btDevList);
     }
 
     /**

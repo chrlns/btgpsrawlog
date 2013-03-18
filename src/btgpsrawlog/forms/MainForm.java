@@ -22,28 +22,29 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Spacer;
 
 /**
- * Main form of the app.
+ * Start screen of the app.
+ * 
  * @author Christian Lins
  */
 public class MainForm extends Form {
 
-	public static final Command EXIT = new Command("Exit", null, Command.EXIT, 0);
-	public static final Command START = new Command("Continue", null, Command.OK, 1);
-	public static final Command ABOUT = new Command("About", null, Command.HELP, 0);
+    public static final Command EXIT  = new Command("Exit", "Exit app", Command.EXIT, 0);
+    public static final Command START = new Command("Continue", "Continue with device discovery",
+                                              Command.OK, 1);
+    public static final Command ABOUT = new Command("About", null, Command.HELP, 0);
 
-	private static final String MSG =
-			"Press Continue to select a bluetooth GPS device, " +
-			"choose a location to save the NMEA log and " +
-			"start walking around to collect data!";
+    private static final String MSG   = "Press Continue to select a bluetooth GPS device, "
+                                              + "choose a location to save the NMEA log and "
+                                              + "start walking around to collect data!";
 
-	public MainForm() {
-		super("Bluetooth GPS Logger");
+    public MainForm() {
+        super("Bluetooth GPS Logger");
 
-		append(new Spacer(getWidth(), 10));
-		append(MSG);
+        append(new Spacer(getWidth(), 10));
+        append(MSG);
 
-		addCommand(EXIT);
-		addCommand(START);
-		addCommand(ABOUT);
-	}
+        addCommand(EXIT);
+        addCommand(START);
+        addCommand(ABOUT);
+    }
 }

@@ -63,7 +63,7 @@ public class EventController implements CommandListener {
                     this.midlet.destroyApp(false);
                     this.midlet.notifyDestroyed();
                 } else if (cmd.equals(MainForm.START)) {
-
+                    this.midlet.showBluetoothDeviceList();
                 } else if (cmd.equals(MainForm.ABOUT)) {
                     this.midlet.showAboutForm();
                 }

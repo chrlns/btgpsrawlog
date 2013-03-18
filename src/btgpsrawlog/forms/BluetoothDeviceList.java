@@ -33,5 +33,9 @@ public class BluetoothDeviceList extends List {
     public BluetoothDeviceList(BTGPSRawLogMidlet midlet) {
         super("Bluetooth GPS devices", List.IMPLICIT);
         this.midlet = midlet;
+
+        addCommand(BACK);
+        addCommand(SEARCH);
+        addCommand(SELECT);
     }
 }

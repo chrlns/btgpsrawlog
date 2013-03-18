@@ -17,6 +17,12 @@
  */
 package btgpsrawlog.events;
 
+import java.io.IOException;
+
+import javax.bluetooth.DeviceClass;
+import javax.bluetooth.DiscoveryListener;
+import javax.bluetooth.RemoteDevice;
+import javax.bluetooth.ServiceRecord;
 import javax.bluetooth.UUID;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -27,7 +33,7 @@ import btgpsrawlog.BTGPSRawLogMidlet;
 import btgpsrawlog.BluetoothDeviceDiscoverer;
 import btgpsrawlog.forms.BluetoothDeviceList;
 
-public class BluetoothDeviceListController implements CommandListener {
+public class BluetoothDeviceListController implements CommandListener, DiscoveryListener {
 
     protected BluetoothDeviceDiscoverer bluetoothDeviceDiscoverer;
     protected BluetoothDeviceList       bluetoothDeviceList;
@@ -39,6 +45,7 @@ public class BluetoothDeviceListController implements CommandListener {
         this.midlet = midlet;
 
         this.bluetoothDeviceDiscoverer = new BluetoothDeviceDiscoverer(midlet);
+        this.bluetoothDeviceDiscoverer.addDiscoveryListener(this);
     }
 
     public void commandAction(Command cmd, Displayable disp) {
@@ -56,10 +63,40 @@ public class BluetoothDeviceListController implements CommandListener {
                 bluetoothDeviceDiscoverer
                         .startInquiry(/* 0x1101 = Serial port */new UUID[] { new UUID(0x1101) });
                 Display.getDisplay(this.midlet).setCurrent(bluetoothDeviceList);
+                this.bluetoothDeviceList.deleteAll();
+                this.bluetoothDeviceList.append("Searching...", null);
             }
         } catch (Exception ex) {
-            bluetoothDeviceList.append(ex.toString(), null);
+            bluetoothDeviceList.append("Error: " + ex.getMessage(), null);
         }
+    }
+
+    public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
+        String deviceName;
+        try {
+            deviceName = btDevice.getFriendlyName(false);
+            this.bluetoothDeviceList.append(deviceName, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            this.bluetoothDeviceList.append(e.getMessage(), null);
+        }
+    }
+
+    public void inquiryCompleted(int discType) {
+        if (!this.bluetoothDeviceDiscoverer.hasDevices()) {
+            this.bluetoothDeviceList.deleteAll();
+            this.bluetoothDeviceList.append("No devices found!", null);
+        }
+    }
+
+    public void serviceSearchCompleted(int transID, int respCode) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
+        // TODO Auto-generated method stub
+
     }
 
 }

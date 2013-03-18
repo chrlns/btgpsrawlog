@@ -18,63 +18,122 @@
 package btgpsrawlog;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Vector;
 
+import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DeviceClass;
+import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.DiscoveryListener;
+import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 import javax.bluetooth.UUID;
 import javax.microedition.lcdui.Display;
 
+/**
+ * Handles discovery of Bluetooth devices and its services.
+ * 
+ * @author Christian Lins
+ * 
+ */
 public class BluetoothDeviceDiscoverer implements DiscoveryListener {
 
+    protected DiscoveryAgent    discoveryAgent;
+    protected Vector            devices   = new Vector();
+    protected Vector            listeners = new Vector();
     protected BTGPSRawLogMidlet midlet;
+    protected UUID[]            serviceUUIDs;
+    protected Vector            services  = new Vector();
 
     public BluetoothDeviceDiscoverer(BTGPSRawLogMidlet midlet) {
         this.midlet = midlet;
     }
 
-    public void startInquiry(UUID[] serviceUUIDs) {
+    public void addDiscoveryListener(DiscoveryListener listener) {
+        this.listeners.addElement(listeners);
+    }
 
+    public boolean hasDevices() {
+        return this.devices.size() > 0;
+    }
+
+    public void startInquiry(UUID[] serviceUUIDs) throws BluetoothStateException {
+        this.serviceUUIDs = serviceUUIDs;
+        // TODO: Check if Bluetooth is enabled: localDevice.isPoweredOn()
+        LocalDevice localDevice = LocalDevice.getLocalDevice();
+        discoveryAgent = localDevice.getDiscoveryAgent();
+        discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
     }
 
     public void cancelInquiry() {
-
+        if (discoveryAgent != null) {
+            this.discoveryAgent.cancelInquiry(this);
+        }
     }
 
     public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
-        // TODO Auto-generated method stub
-
+        if (!this.devices.contains(btDevice)) {
+            this.devices.addElement(btDevice);
+            fireDeviceDiscoveredEvent(btDevice, cod);
+        }
     }
 
     public void inquiryCompleted(int discType) {
-        // TODO Auto-generated method stub
-
+        fireInquiryCompletedEvent(discType);
     }
 
     public void serviceSearchCompleted(int transID, int respCode) {
-        // TODO Auto-generated method stub
-
+        ServiceRecord serviceRecord = getFirstDiscoveredService();
+        String url = serviceRecord.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
+        RawLogger logger;
+        try {
+            logger = new RawLogger(url, serviceRecord.getHostDevice().getFriendlyName(false));
+            this.midlet.getLoggerForm().setLogger(logger);
+        } catch (IOException e) {
+            this.midlet.getLoggerForm().append(e.getMessage());
+        }
+        Display.getDisplay(this.midlet).setCurrent(this.midlet.getLoggerForm());
     }
 
     public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
-        // TODO Auto-generated method stub
-
+        for (int n = 0; n < servRecord.length; n++) {
+            ServiceRecord record = servRecord[n];
+            services.addElement(record);
+        }
     }
 
-    public boolean select(int idx) {
-        return false;
+    protected void fireDeviceDiscoveredEvent(RemoteDevice btDevice, DeviceClass cod) {
+        Enumeration enum = listeners.elements();
+        while (enum.hasMoreElements()) {
+            Object el = enum.nextElement();
+            if (el instanceof DiscoveryListener) {
+                ((DiscoveryListener) el).deviceDiscovered(btDevice, cod);
+            }
+        }
+    }
+
+    protected void fireInquiryCompletedEvent(int discType) {
+        Enumeration enum = listeners.elements();
+        while (enum.hasMoreElements()) {
+            Object el = enum.nextElement();
+            if (el instanceof DiscoveryListener) {
+                ((DiscoveryListener) el).inquiryCompleted(discType);
+            }
+        }
+    }
+
+    public boolean select(int idx) throws BluetoothStateException {
+        if (idx < this.devices.size()) {
+            RemoteDevice dev = (RemoteDevice) this.devices.elementAt(idx);
+            this.discoveryAgent.searchServices(null, serviceUUIDs, dev, this);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     protected ServiceRecord getFirstDiscoveredService() {
-        return null;
-    }
-
-    protected void serviceDiscoveryCompleted() throws IOException {
-        ServiceRecord serviceRecord = getFirstDiscoveredService();
-        String url = serviceRecord.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
-        RawLogger logger = new RawLogger(url, serviceRecord.getHostDevice().getFriendlyName(false));
-        this.midlet.getLoggerForm().setLogger(logger);
-        Display.getDisplay(this.midlet).setCurrent(this.midlet.getSaveLogForm());
+        return (ServiceRecord) this.services.elementAt(0);
     }
 }
