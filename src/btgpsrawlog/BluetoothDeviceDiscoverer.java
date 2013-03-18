@@ -17,15 +17,28 @@
  */
 package btgpsrawlog;
 
+import java.io.IOException;
+
 import javax.bluetooth.DeviceClass;
 import javax.bluetooth.DiscoveryListener;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 import javax.bluetooth.UUID;
+import javax.microedition.lcdui.Display;
 
 public class BluetoothDeviceDiscoverer implements DiscoveryListener {
 
+    protected BTGPSRawLogMidlet midlet;
+
+    public BluetoothDeviceDiscoverer(BTGPSRawLogMidlet midlet) {
+        this.midlet = midlet;
+    }
+
     public void startInquiry(UUID[] serviceUUIDs) {
+
+    }
+
+    public void cancelInquiry() {
 
     }
 
@@ -49,4 +62,19 @@ public class BluetoothDeviceDiscoverer implements DiscoveryListener {
 
     }
 
+    public boolean select(int idx) {
+        return false;
+    }
+
+    protected ServiceRecord getFirstDiscoveredService() {
+        return null;
+    }
+
+    protected void serviceDiscoveryCompleted() throws IOException {
+        ServiceRecord serviceRecord = getFirstDiscoveredService();
+        String url = serviceRecord.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
+        RawLogger logger = new RawLogger(url, serviceRecord.getHostDevice().getFriendlyName(false));
+        this.midlet.getLoggerForm().setLogger(logger);
+        Display.getDisplay(this.midlet).setCurrent(this.midlet.getSaveLogForm());
+    }
 }

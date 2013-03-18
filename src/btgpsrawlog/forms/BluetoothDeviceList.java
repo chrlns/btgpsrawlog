@@ -24,13 +24,14 @@ import btgpsrawlog.BTGPSRawLogMidlet;
 
 public class BluetoothDeviceList extends List {
 
-	public static Command BACK   = new Command("Back", Command.BACK, 1);
-	public static Command SELECT = new Command("Select", "Select device", Command.OK, 2);
-	
-	protected BTGPSRawLogMidlet midlet;
-	
-	public BluetoothDeviceList(BTGPSRawLogMidlet midlet) {
-		super("Bluetooth GPS devices", List.IMPLICIT);
-		this.midlet = midlet;
-	}
+    public static Command       BACK   = new Command("Back", Command.BACK, 1);
+    public static Command       SEARCH = new Command("Search", "Search devices", Command.OK, 2);
+    public static Command       SELECT = new Command("Select", "Select device", Command.OK, 2);
+
+    protected BTGPSRawLogMidlet midlet;
+
+    public BluetoothDeviceList(BTGPSRawLogMidlet midlet) {
+        super("Bluetooth GPS devices", List.IMPLICIT);
+        this.midlet = midlet;
+    }
 }

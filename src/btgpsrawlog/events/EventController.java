@@ -17,84 +17,70 @@
  */
 package btgpsrawlog.events;
 
-import javax.bluetooth.UUID;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
 import btgpsrawlog.BTGPSRawLogMidlet;
-import btgpsrawlog.BluetoothDeviceDiscoverer;
 import btgpsrawlog.forms.AboutForm;
-import btgpsrawlog.forms.BluetoothDeviceList;
 import btgpsrawlog.forms.LoggerForm;
 import btgpsrawlog.forms.MainForm;
 import btgpsrawlog.forms.SaveLogForm;
 
 /**
- * Handles events of all Forms.
+ * Handles events of most forms.
  * 
  * @author Christian Lins
  */
 public class EventController implements CommandListener {
 
-    private final BluetoothDeviceList bluetoothDevicesList;
-    private final LoggerForm          loggerForm;
-    private final MainForm            mainForm;
-    private final SaveLogForm         saveLogForm;
-    private final AboutForm           aboutForm;
-    private final BTGPSRawLogMidlet   midlet;
+    protected BTGPSRawLogMidlet midlet;
 
-    public EventController(BTGPSRawLogMidlet midlet, BluetoothDeviceList bluetoothDevicesList, LoggerForm loggerForm,
-            MainForm mainForm, SaveLogForm saveLogForm, AboutForm aboutForm) {
+    public EventController(BTGPSRawLogMidlet midlet) {
         this.midlet = midlet;
-        this.bluetoothDevicesList = bluetoothDevicesList;
-        this.loggerForm = loggerForm;
-        this.mainForm = mainForm;
-        this.saveLogForm = saveLogForm;
-        this.aboutForm = aboutForm;
     }
 
     public void commandAction(Command cmd, Displayable disp) {
-        if (disp.equals(loggerForm)) {
+        if (disp.equals(this.midlet.getLoggerForm())) {
             if (cmd.equals(LoggerForm.START)) {
                 try {
+                    LoggerForm loggerForm = this.midlet.getLoggerForm();
                     loggerForm.removeCommand(LoggerForm.START);
                     loggerForm.getLogger().connect();
                     loggerForm.getLogger().start();
                     loggerForm.addCommand(LoggerForm.STOP);
                 } catch (Exception ex) {
-                    loggerForm.append(ex.getMessage());
+                    this.midlet.getLoggerForm().append(ex.getMessage());
                 }
             } else if (cmd.equals(LoggerForm.STOP)) {
-                loggerForm.getLogger().disconnect();
-                Display.getDisplay(this.midlet).setCurrent(this.mainForm);
+                this.midlet.getLoggerForm().getLogger().disconnect();
+                this.midlet.showMainForm();
             }
-        } else if (disp.equals(mainForm)) {
+        } else if (disp.equals(this.midlet.getMainForm())) {
             try {
                 if (cmd.equals(MainForm.EXIT)) {
                     this.midlet.destroyApp(false);
                     this.midlet.notifyDestroyed();
                 } else if (cmd.equals(MainForm.START)) {
-                    BluetoothDeviceDiscoverer btdevdis = new BluetoothDeviceDiscoverer();
-                    btdevdis.startInquiry(/* 0x1101 = Serial port */new UUID[] { new UUID(0x1101) });
-                    Display.getDisplay(this.midlet).setCurrent(bluetoothDevicesList);
+
                 } else if (cmd.equals(MainForm.ABOUT)) {
-                    Display.getDisplay(midlet).setCurrent(aboutForm);
+                    this.midlet.showAboutForm();
                 }
             } catch (Exception ex) {
-                mainForm.append(ex.getMessage());
+                this.midlet.getMainForm().append(ex.getMessage());
             }
-        } else if (disp.equals(saveLogForm)) {
+        } else if (disp.equals(this.midlet.getSaveLogForm())) {
             if (cmd.equals(SaveLogForm.OK)) {
-                loggerForm.getLogger().setSaveFile(saveLogForm.getPath());
-                Display.getDisplay(midlet).setCurrent(loggerForm);
+                this.midlet.getLoggerForm().getLogger()
+                        .setSaveFile(this.midlet.getSaveLogForm().getPath());
+                Display.getDisplay(midlet).setCurrent(this.midlet.getLoggerForm());
             } else if (cmd.equals(SaveLogForm.BACK)) {
                 // Go back to Bluetooth selection
-                commandAction(MainForm.START, mainForm);
+                commandAction(MainForm.START, this.midlet.getMainForm());
             }
         } else if (cmd.equals(AboutForm.BACK)) {
-            Display.getDisplay(midlet).setCurrent(mainForm);
+            Display.getDisplay(midlet).setCurrent(this.midlet.getMainForm());
         }
     }
 

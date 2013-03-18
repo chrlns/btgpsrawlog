@@ -17,45 +17,45 @@
  */
 package btgpsrawlog.events;
 
-import javax.bluetooth.ServiceRecord;
+import javax.bluetooth.UUID;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 
 import btgpsrawlog.BTGPSRawLogMidlet;
-import btgpsrawlog.RawLogger;
+import btgpsrawlog.BluetoothDeviceDiscoverer;
 import btgpsrawlog.forms.BluetoothDeviceList;
-import btgpsrawlog.forms.MainForm;
 
 public class BluetoothDeviceListController implements CommandListener {
 
-    protected BluetoothDeviceList bluetoothDeviceList;
-    protected BTGPSRawLogMidlet   midlet;
+    protected BluetoothDeviceDiscoverer bluetoothDeviceDiscoverer;
+    protected BluetoothDeviceList       bluetoothDeviceList;
+    protected BTGPSRawLogMidlet         midlet;
 
-    public BluetoothDeviceListController(BluetoothDeviceList bluetoothDeviceList, BTGPSRawLogMidlet midlet) {
+    public BluetoothDeviceListController(BluetoothDeviceList bluetoothDeviceList,
+            BTGPSRawLogMidlet midlet) {
         this.bluetoothDeviceList = bluetoothDeviceList;
         this.midlet = midlet;
+
+        this.bluetoothDeviceDiscoverer = new BluetoothDeviceDiscoverer(midlet);
     }
 
     public void commandAction(Command cmd, Displayable disp) {
         try {
             if (cmd.equals(BluetoothDeviceList.BACK)) {
-                // TODO: Stop running inquiry
+                this.bluetoothDeviceDiscoverer.cancelInquiry();
                 this.midlet.showMainForm();
             } else if (cmd.equals(BluetoothDeviceList.SELECT)) {
-                if (bluetoothDeviceList.select()) {
+                int devIdx = bluetoothDeviceList.getSelectedIndex();
+                if (bluetoothDeviceDiscoverer.select(devIdx)) {
                     bluetoothDeviceList.deleteAll();
                     bluetoothDeviceList.append("[Please wait...]", null);
                 }
             } else if (cmd.equals(BluetoothDeviceList.SEARCH)) {
-                commandAction(MainForm.START, mainForm);
-            } else if (cmd.equals(BluetoothDeviceList.COMPLETED)) {
-                ServiceRecord serviceRecord = bluetoothDeviceList.getFirstDiscoveredService();
-                String url = serviceRecord.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
-                RawLogger logger = new RawLogger(url, serviceRecord.getHostDevice().getFriendlyName(false));
-                loggerForm.setLogger(logger);
-                Display.getDisplay(this.midlet).setCurrent(this.saveLogForm);
+                bluetoothDeviceDiscoverer
+                        .startInquiry(/* 0x1101 = Serial port */new UUID[] { new UUID(0x1101) });
+                Display.getDisplay(this.midlet).setCurrent(bluetoothDeviceList);
             }
         } catch (Exception ex) {
             bluetoothDeviceList.append(ex.toString(), null);

@@ -31,64 +31,79 @@ import btgpsrawlog.forms.SaveLogForm;
 
 /**
  * Main MIDlet.
+ * 
  * @author Christian Lins
  */
 public class BTGPSRawLogMidlet extends MIDlet {
 
-	protected Displayable currentDisplay;
-	protected EventController eventController;
-	protected RawLogger rawLogger = null;
-	
-	protected MainForm mainForm;
+    protected Displayable     currentDisplay;
+    protected EventController eventController;
+    protected RawLogger       rawLogger   = null;
 
-	public BTGPSRawLogMidlet() {
-		BluetoothDeviceList btDevList = new BluetoothDeviceList(this);
-		LoggerForm loggerForm = new LoggerForm();
-		SaveLogForm saveLogForm = new SaveLogForm();
-		AboutForm aboutForm = new AboutForm(this);
-		mainForm = new MainForm();
+    protected AboutForm       aboutForm   = new AboutForm(this);
+    protected LoggerForm      loggerForm  = new LoggerForm();
+    protected MainForm        mainForm    = new MainForm();
+    protected SaveLogForm     saveLogForm = new SaveLogForm();
 
-		this.eventController = 
-				new EventController(this, btDevList, loggerForm, mainForm, saveLogForm, aboutForm);
-		btDevList.setCommandListener(
-				new BluetoothDeviceListController(btDevList, this));
-		loggerForm.setCommandListener(eventController);
-		mainForm.setCommandListener(eventController);
-		saveLogForm.setCommandListener(eventController);
-		aboutForm.setCommandListener(eventController);
+    public BTGPSRawLogMidlet() {
+        BluetoothDeviceList btDevList = new BluetoothDeviceList(this);
 
-		this.currentDisplay = mainForm;
-	}
+        this.eventController = new EventController(this);
+        btDevList.setCommandListener(new BluetoothDeviceListController(btDevList, this));
+        loggerForm.setCommandListener(eventController);
+        mainForm.setCommandListener(eventController);
+        saveLogForm.setCommandListener(eventController);
+        aboutForm.setCommandListener(eventController);
 
-	public RawLogger getLogger() {
-		return this.rawLogger;
-	}
+        this.currentDisplay = mainForm;
+    }
 
-	public void setRawLogger(RawLogger rawLogger) {
-		this.rawLogger = rawLogger;
-	}
+    public RawLogger getLogger() {
+        return this.rawLogger;
+    }
 
-	public void startApp() {
-		Display display = Display.getDisplay(this);
-		display.setCurrent(currentDisplay);
-	}
+    public LoggerForm getLoggerForm() {
+        return this.loggerForm;
+    }
 
-	public void pauseApp() {
-		Display display = Display.getDisplay(this);
-		this.currentDisplay = display.getCurrent();
-	}
-	
-	public void showMainForm() {
-		Display.getDisplay(this).setCurrent(this.mainForm);
-	}
+    public MainForm getMainForm() {
+        return this.mainForm;
+    }
 
-	/**
-	 * Called by the program manager when the app is about to destroyed.
-	 * @param unconditional
-	 */
-	public void destroyApp(boolean unconditional) {
-		if(this.rawLogger != null) {
-			this.rawLogger.stop();
-		}
-	}
+    public SaveLogForm getSaveLogForm() {
+        return this.saveLogForm;
+    }
+
+    public void setRawLogger(RawLogger rawLogger) {
+        this.rawLogger = rawLogger;
+    }
+
+    public void startApp() {
+        Display display = Display.getDisplay(this);
+        display.setCurrent(currentDisplay);
+    }
+
+    public void pauseApp() {
+        Display display = Display.getDisplay(this);
+        this.currentDisplay = display.getCurrent();
+    }
+
+    public void showMainForm() {
+        Display.getDisplay(this).setCurrent(this.mainForm);
+    }
+
+    public void showAboutForm() {
+        Display.getDisplay(this).setCurrent(this.aboutForm);
+    }
+
+    /**
+     * Called by the program manager when the app is about to destroyed.
+     * 
+     * @param unconditional
+     */
+    public void destroyApp(boolean unconditional) {
+        if (this.rawLogger != null) {
+            this.rawLogger.stop();
+        }
+    }
 }
