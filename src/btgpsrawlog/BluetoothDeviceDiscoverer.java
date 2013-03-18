@@ -51,7 +51,7 @@ public class BluetoothDeviceDiscoverer implements DiscoveryListener {
     }
 
     public void addDiscoveryListener(DiscoveryListener listener) {
-        this.listeners.addElement(listeners);
+        this.listeners.addElement(listener);
     }
 
     public boolean hasDevices() {
