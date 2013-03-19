@@ -33,6 +33,13 @@ import btgpsrawlog.BTGPSRawLogMidlet;
 import btgpsrawlog.BluetoothDeviceDiscoverer;
 import btgpsrawlog.forms.BluetoothDeviceList;
 
+/**
+ * Handles events of the Bluetooth devices list and reacts to results of the
+ * BluetoothDeviceDiscoverer.
+ * 
+ * @author Christian Lins
+ * 
+ */
 public class BluetoothDeviceListController implements CommandListener, DiscoveryListener {
 
     protected BluetoothDeviceDiscoverer bluetoothDeviceDiscoverer;
@@ -83,7 +90,9 @@ public class BluetoothDeviceListController implements CommandListener, Discovery
     }
 
     public void inquiryCompleted(int discType) {
-        if (!this.bluetoothDeviceDiscoverer.hasDevices()) {
+        if (this.bluetoothDeviceDiscoverer.hasDevices()) {
+            this.bluetoothDeviceList.delete(0);
+        } else {
             this.bluetoothDeviceList.deleteAll();
             this.bluetoothDeviceList.append("No devices found!", null);
         }
