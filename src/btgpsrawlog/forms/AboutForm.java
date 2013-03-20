@@ -23,21 +23,22 @@ import javax.microedition.lcdui.StringItem;
 import javax.microedition.midlet.MIDlet;
 
 /**
- *
- * @author Christian
+ * Shows some information about this app.
+ * 
+ * @author Christian Lins
  */
 public class AboutForm extends Form {
 
-	public static final Command BACK = new Command("Back", null, Command.BACK, 0);
-	
-	public AboutForm(MIDlet midlet) {
-		super("About");
-		
-		append(new StringItem("Name", midlet.getAppProperty("MIDlet-Name")));
-		append(new StringItem("Version", midlet.getAppProperty("MIDlet-Version")));
-		append(new StringItem("Author", midlet.getAppProperty("MIDlet-Vendor")));
-		
-		addCommand(BACK);
-	}
+    public static final Command BACK = new Command("Back", null, Command.BACK, 0);
+
+    public AboutForm(MIDlet midlet) {
+        super("About");
+
+        append(new StringItem("Name", midlet.getAppProperty("MIDlet-Name")));
+        append(new StringItem("Version", midlet.getAppProperty("MIDlet-Version")));
+        append(new StringItem("Author", midlet.getAppProperty("MIDlet-Vendor")));
+
+        addCommand(BACK);
+    }
 
 }

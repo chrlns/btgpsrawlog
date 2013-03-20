@@ -18,6 +18,7 @@
 package btgpsrawlog.forms;
 
 import java.util.Enumeration;
+
 import javax.microedition.io.file.FileSystemRegistry;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
@@ -26,42 +27,55 @@ import javax.microedition.lcdui.TextField;
 
 /**
  * Allows the user to select the logfile save location.
+ * 
  * @author Christian Lins
  */
 public class SaveLogForm extends Form {
 
-	public static final Command BACK = new Command("Back", Command.BACK, 0);
-	public static final Command OK = new Command("Continue", Command.OK, 1);
+    public static final Command BACK        = new Command("Back", Command.BACK, 0);
+    public static final Command OK          = new Command("Continue", Command.OK, 1);
 
-	private ChoiceGroup choiceGroup = new ChoiceGroup("Roots:", ChoiceGroup.EXCLUSIVE);
-	private TextField fileName = new TextField("File name", "nmea.txt", 64, 0);
+    private final ChoiceGroup   choiceGroup = new ChoiceGroup("Save locations:",
+                                                    ChoiceGroup.EXCLUSIVE);
+    private final TextField     fileName    = new TextField("File name", "nmea.txt", 64, 0);
 
-	public SaveLogForm() {
-		super("Choose save location");
+    public SaveLogForm() {
+        super("Choose save location");
 
-		append(fileName);
+        append(fileName);
 
-		Enumeration drives = FileSystemRegistry.listRoots();
-		while (drives.hasMoreElements()) {
-			String driveString = drives.nextElement().toString();
-			choiceGroup.append(driveString, null);
-		}
+        int memCardIdx = 0;
+        Enumeration drives = FileSystemRegistry.listRoots();
+        while (drives.hasMoreElements()) {
+            String driveString = drives.nextElement().toString();
+            if (driveString.equalsIgnoreCase("c:/")) {
+                driveString = "C:/ (Phone memory)";
+            } else if (driveString.equalsIgnoreCase("e:/")) {
+                memCardIdx = choiceGroup.size();
+                driveString = "E:/ (Memory card)";
+            }
+            choiceGroup.append(driveString, null);
+        }
 
-		append(choiceGroup);
+        append(choiceGroup);
 
-		addCommand(BACK);
-		addCommand(OK);
-	}
+        // Preselect the memory card as the phone memory is often
+        // write-protected
+        choiceGroup.setSelectedIndex(memCardIdx, true);
 
-	public String getPath() {
-		String path = choiceGroup.getString(choiceGroup.getSelectedIndex());
-		StringBuffer buf = new StringBuffer();
-		buf.append("file://");
-		buf.append(path);
-		if(!path.endsWith("/")) {
-			buf.append('/');
-		}
-		buf.append(fileName.getString());
-		return buf.toString();
-	}
+        addCommand(BACK);
+        addCommand(OK);
+    }
+
+    public String getPath() {
+        String path = choiceGroup.getString(choiceGroup.getSelectedIndex()).substring(0, 3);
+        StringBuffer buf = new StringBuffer();
+        buf.append("file://");
+        buf.append(path);
+        if (!path.endsWith("/")) {
+            buf.append('/');
+        }
+        buf.append(fileName.getString());
+        return buf.toString();
+    }
 }

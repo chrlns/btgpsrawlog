@@ -28,6 +28,7 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
+import javax.microedition.lcdui.List;
 
 import btgpsrawlog.BTGPSRawLogMidlet;
 import btgpsrawlog.BluetoothDeviceDiscoverer;
@@ -60,11 +61,11 @@ public class BluetoothDeviceListController implements CommandListener, Discovery
             if (cmd.equals(BluetoothDeviceList.BACK)) {
                 this.bluetoothDeviceDiscoverer.cancelInquiry();
                 this.midlet.showMainForm();
-            } else if (cmd.equals(BluetoothDeviceList.SELECT)) {
+            } else if (cmd.equals(List.SELECT_COMMAND)) {
                 int devIdx = bluetoothDeviceList.getSelectedIndex();
                 if (bluetoothDeviceDiscoverer.select(devIdx)) {
                     bluetoothDeviceList.deleteAll();
-                    bluetoothDeviceList.append("[Please wait...]", null);
+                    bluetoothDeviceList.append("Please wait...", null);
                 }
             } else if (cmd.equals(BluetoothDeviceList.SEARCH)) {
                 bluetoothDeviceDiscoverer

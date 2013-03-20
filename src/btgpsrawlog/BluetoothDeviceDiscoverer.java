@@ -93,7 +93,7 @@ public class BluetoothDeviceDiscoverer implements DiscoveryListener {
         } catch (IOException e) {
             this.midlet.getLoggerForm().append(e.getMessage());
         }
-        Display.getDisplay(this.midlet).setCurrent(this.midlet.getLoggerForm());
+        Display.getDisplay(this.midlet).setCurrent(this.midlet.getSaveLogForm());
     }
 
     public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {

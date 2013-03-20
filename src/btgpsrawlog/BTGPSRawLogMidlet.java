@@ -36,19 +36,21 @@ import btgpsrawlog.forms.SaveLogForm;
  */
 public class BTGPSRawLogMidlet extends MIDlet {
 
-    protected Displayable         currentDisplay;
-    protected EventController     eventController;
-    protected RawLogger           rawLogger   = null;
+    protected BluetoothDeviceListController btDevListController;
+    protected Displayable                   currentDisplay;
+    protected EventController               eventController;
+    protected RawLogger                     rawLogger   = null;
 
-    protected AboutForm           aboutForm   = new AboutForm(this);
-    protected BluetoothDeviceList btDevList   = new BluetoothDeviceList(this);
-    protected LoggerForm          loggerForm  = new LoggerForm();
-    protected MainForm            mainForm    = new MainForm();
-    protected SaveLogForm         saveLogForm = new SaveLogForm();
+    protected AboutForm                     aboutForm   = new AboutForm(this);
+    protected BluetoothDeviceList           btDevList   = new BluetoothDeviceList(this);
+    protected LoggerForm                    loggerForm  = new LoggerForm();
+    protected MainForm                      mainForm    = new MainForm();
+    protected SaveLogForm                   saveLogForm = new SaveLogForm();
 
     public BTGPSRawLogMidlet() {
         this.eventController = new EventController(this);
-        btDevList.setCommandListener(new BluetoothDeviceListController(btDevList, this));
+        this.btDevListController = new BluetoothDeviceListController(btDevList, this);
+        btDevList.setCommandListener(this.btDevListController);
         loggerForm.setCommandListener(eventController);
         mainForm.setCommandListener(eventController);
         saveLogForm.setCommandListener(eventController);
@@ -97,6 +99,9 @@ public class BTGPSRawLogMidlet extends MIDlet {
 
     public void showBluetoothDeviceList() {
         Display.getDisplay(this).setCurrent(this.btDevList);
+
+        // Start the search for bluetooth device immediately
+        this.btDevListController.commandAction(BluetoothDeviceList.SEARCH, this.btDevList);
     }
 
     /**

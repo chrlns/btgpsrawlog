@@ -25,8 +25,7 @@ import btgpsrawlog.BTGPSRawLogMidlet;
 public class BluetoothDeviceList extends List {
 
     public static Command       BACK   = new Command("Back", Command.BACK, 1);
-    public static Command       SEARCH = new Command("Search", "Search devices", Command.OK, 2);
-    public static Command       SELECT = new Command("Select", "Select device", Command.OK, 2);
+    public static Command       SEARCH = new Command("Search", "Start device search", Command.OK, 2);
 
     protected BTGPSRawLogMidlet midlet;
 
@@ -36,6 +35,5 @@ public class BluetoothDeviceList extends List {
 
         addCommand(BACK);
         addCommand(SEARCH);
-        addCommand(SELECT);
     }
 }
