@@ -10,3 +10,5 @@ S40 6th Edition:      might work, not tested
 S40 6th Ed. FP1:      assumed to work, tested by Nokia QA
 S40 6th Edition Lite: might work, not tested
 S40 DP 1.0:           might work, not tested
+S40 DP 1.1:           might work, not tested
+S40 DP 2.0:           compatible
