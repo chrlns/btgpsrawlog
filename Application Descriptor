@@ -4,4 +4,5 @@ MIDlet-Jar-URL: btgpsrawlog.jar
 MicroEdition-Configuration: CLDC-1.1
 MicroEdition-Profile: MIDP-2.0
 MIDlet-1: Bluetooth GPS Logger,/resources/btgpsrawlog.png,btgpsrawlog.BTGPSRawLogMidlet
+MIDlet-Permissions: javax.microedition.io.Connector.http,javax.microedition.io.Connector.https,javax.microedition.io.Connector.file.write
 MIDlet-Name: Bluetooth GPS Logger

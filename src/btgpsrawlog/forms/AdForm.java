@@ -24,9 +24,9 @@ import java.util.Vector;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.ImageItem;
+import javax.microedition.lcdui.Spacer;
 
 import InneractiveSDK.IADView;
-import InneractiveSDK.IADView.IaOptionalParams;
 import btgpsrawlog.BTGPSRawLogMidlet;
 
 public class AdForm extends Form {
@@ -40,122 +40,51 @@ public class AdForm extends Form {
     protected Vector    ad;
     protected ImageItem imageItem               = new ImageItem("", null, ImageItem.LAYOUT_DEFAULT,
                                                         "");
-    protected Worker    worker;
+
+    class Loader extends Thread {
+        public void run() {
+            try {
+                loadBannerAd();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public AdForm(String title) {
         super(title);
 
-        try {
-            jbInit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        worker = new Worker(this);
-        worker.start();
-        worker.doTask(GET_BANNER_AD);
-    }
-
-    class Worker extends Thread {
-
-        boolean terminated = false;
-        int     mTask;
-        AdForm  mOwner;
-
-        public Worker(AdForm owner) {
-            mOwner = owner;
-        }
-
-        synchronized public void run() {
-
-            while (!terminated) {
-                mTask = IDLE;
-                try {
-                    wait();
-                } catch (InterruptedException ex) {
-                }
-
-                try {
-                    switch (mTask) {
-                    case CLICK_THE_BANNER:
-                        if (null != ad) {
-                            String clickURL = (String) ad.elementAt(1);
-                            if (null != clickURL && !clickURL.equals("")) {
-                                boolean forceExit = BTGPSRawLogMidlet.instance
-                                        .platformRequest(clickURL);
-
-                                System.out.println("platformRequest - the midlet should be close? "
-                                        + forceExit);
-
-                                if (forceExit) {
-                                    BTGPSRawLogMidlet.quitApp();
-                                }
-                            }
-                        }
-                        break;
-
-                    case DISPLAY_INTERSTITIAL_AD:
-                        System.out.println("IADView.displayInterstitialAd()");
-                        Hashtable interstitialData = new Hashtable();
-                        interstitialData.put(IaOptionalParams.Key_Age, "30");
-                        interstitialData.put(IaOptionalParams.Key_Gender, "F");
-                        interstitialData.put(IaOptionalParams.Key_Gps_Location,
-                                "53.542132,-2.239856");
-                        interstitialData.put(IaOptionalParams.Key_Keywords, "Games");
-                        interstitialData.put(IaOptionalParams.Key_Location, "US");
-                        interstitialData.put(IaOptionalParams.Key_interstitial_GO_btn, "GO");
-                        interstitialData.put(IaOptionalParams.Key_interstitial_SKIP_btn, "SKIP");
-                        IADView.displayInterstitialAd(BTGPSRawLogMidlet.instance,
-                                "MyCompany_MyApp", interstitialData, BTGPSRawLogMidlet.instance);
-                        break;
-
-                    case GET_BANNER_AD:
-                        System.out.println("IADView.getBannerAd()");
-                        Hashtable metaData = new Hashtable();
-
-                        metaData.put(IaOptionalParams.Key_Age, "30");
-                        metaData.put(IaOptionalParams.Key_Gender, "F");
-                        metaData.put(IaOptionalParams.Key_Gps_Location, "53.542132,-2.239856");
-                        metaData.put(IaOptionalParams.Key_Keywords, "Games");
-                        metaData.put(IaOptionalParams.Key_Location, "US");
-
-                        ad = IADView.getBannerAdData(BTGPSRawLogMidlet.instance, "MyCompany_MyApp",
-                                metaData);
-                        Image retImg = null;
-                        if (null != ad) {
-                            retImg = (Image) ad.elementAt(0);
-                        }
-                        if (retImg != null) {
-                            Image.createImage(retImg);
-                            imageItem.setImage(retImg);
-                        } else {
-                            System.out.println("retImg is null");
-                        }
-
-                        break;
-
-                    case EXIT:
-                        BTGPSRawLogMidlet.quitApp();
-                        break;
-                    }
-                } catch (Exception e) {
-                    mOwner.append(e.getMessage());
-                } catch (Throwable e) {
-                    mOwner.append(e.getMessage());
-                }
-            }
-        }
-
-        synchronized public boolean doTask(int task) {
-            if (mTask != IDLE)
-                return false;
-            mTask = task;
-            notify();
-            return true;
-        }
-    }
-
-    private void jbInit() throws Exception {
         append(imageItem);
+        append(new Spacer(getWidth(), 10));
+
+        Loader loader = new Loader();
+        loader.setPriority(Thread.MIN_PRIORITY);
+        loader.start();
+    }
+
+    private void loadBannerAd() {
+        System.out.println("IADView.getBannerAd()");
+        Hashtable metaData = new Hashtable();
+
+        /*
+         * metaData.put(IaOptionalParams.Key_Age, "30");
+         * metaData.put(IaOptionalParams.Key_Gender, "F");
+         * metaData.put(IaOptionalParams.Key_Gps_Location,
+         * "53.542132,-2.239856"); metaData.put(IaOptionalParams.Key_Keywords,
+         * "Games"); metaData.put(IaOptionalParams.Key_Location, "US");
+         */
+
+        ad = IADView
+                .getBannerAdData(BTGPSRawLogMidlet.instance, "Lins_btgpsrawlog_Nokia", metaData);
+        Image retImg = null;
+        if (null != ad) {
+            retImg = (Image) ad.elementAt(0);
+        }
+        if (retImg != null) {
+            Image.createImage(retImg);
+            imageItem.setImage(retImg);
+        } else {
+            System.out.println("retImg is null");
+        }
     }
 }
