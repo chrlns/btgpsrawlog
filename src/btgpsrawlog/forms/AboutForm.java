@@ -18,7 +18,6 @@
 package btgpsrawlog.forms;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.midlet.MIDlet;
 
@@ -27,7 +26,7 @@ import javax.microedition.midlet.MIDlet;
  * 
  * @author Christian Lins
  */
-public class AboutForm extends Form {
+public class AboutForm extends AdForm {
 
     public static final Command BACK = new Command("Back", null, Command.BACK, 0);
 

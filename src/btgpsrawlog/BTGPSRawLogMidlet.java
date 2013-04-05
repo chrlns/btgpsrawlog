@@ -15,12 +15,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package btgpsrawlog;
 
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
+import InneractiveSDK.InneractiveAdEventsListener;
 import btgpsrawlog.events.BluetoothDeviceListController;
 import btgpsrawlog.events.EventController;
 import btgpsrawlog.forms.AboutForm;
@@ -34,7 +36,18 @@ import btgpsrawlog.forms.SaveLogForm;
  * 
  * @author Christian Lins
  */
-public class BTGPSRawLogMidlet extends MIDlet {
+public class BTGPSRawLogMidlet extends MIDlet implements InneractiveAdEventsListener {
+
+    public static BTGPSRawLogMidlet instance;
+
+    public static void quitApp() {
+        try {
+            instance.destroyApp(true);
+            instance.notifyDestroyed();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
     protected BluetoothDeviceListController btDevListController;
     protected Displayable                   currentDisplay;
@@ -48,6 +61,8 @@ public class BTGPSRawLogMidlet extends MIDlet {
     protected SaveLogForm                   saveLogForm = new SaveLogForm();
 
     public BTGPSRawLogMidlet() {
+        instance = this;
+
         this.eventController = new EventController(this);
         this.btDevListController = new BluetoothDeviceListController(btDevList, this);
         btDevList.setCommandListener(this.btDevListController);
@@ -113,5 +128,30 @@ public class BTGPSRawLogMidlet extends MIDlet {
         if (this.rawLogger != null) {
             this.rawLogger.stop();
         }
+    }
+
+    public void inneractiveOnClickAd() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void inneractiveOnFailedToReceiveAd() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void inneractiveOnReceiveAd() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void inneractiveOnReceiveDefaultAd() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void inneractiveOnSkipAd() {
+        // TODO Auto-generated method stub
+
     }
 }
