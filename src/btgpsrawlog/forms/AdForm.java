@@ -21,70 +21,96 @@ package btgpsrawlog.forms;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.microedition.io.ConnectionNotFoundException;
+import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Image;
 import javax.microedition.lcdui.ImageItem;
+import javax.microedition.lcdui.Item;
+import javax.microedition.lcdui.ItemCommandListener;
 import javax.microedition.lcdui.Spacer;
 
 import InneractiveSDK.IADView;
+import InneractiveSDK.IADView.IaOptionalParams;
 import btgpsrawlog.BTGPSRawLogMidlet;
 
 public class AdForm extends Form {
 
-    final static int    IDLE                    = 0;
-    final static int    GET_BANNER_AD           = 1;
-    final static int    DISPLAY_INTERSTITIAL_AD = 3;
-    final static int    EXIT                    = 4;
-    final static int    CLICK_THE_BANNER        = 5;
+    protected static Vector children = new Vector();
 
-    protected Vector    ad;
-    protected ImageItem imageItem               = new ImageItem("", null, ImageItem.LAYOUT_DEFAULT,
-                                                        "");
+    static {
+        Loader loader = new Loader();
+        loader.setPriority(Thread.MIN_PRIORITY);
+        loader.start();
+    }
 
-    class Loader extends Thread {
+    static class Loader extends Thread {
         public void run() {
             try {
-                loadBannerAd();
+                for (;;) {
+                    Thread.sleep(120000); // 120 seconds
+                    loadBannerAd();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
+    protected Command   bannerClick = new Command("Click the banner!", Command.OK, 0);
+    protected Image     bannerImage;
+    protected String    bannerURL;
+    protected ImageItem imageItem   = new ImageItem("", null, ImageItem.LAYOUT_DEFAULT, "");
+
     public AdForm(String title) {
         super(title);
+
+        imageItem.setDefaultCommand(bannerClick);
+        imageItem.setItemCommandListener(new ItemCommandListener() {
+
+            public void commandAction(Command cmd, Item item) {
+                try {
+                    BTGPSRawLogMidlet.instance.platformRequest(bannerURL);
+                } catch (ConnectionNotFoundException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
         append(imageItem);
         append(new Spacer(getWidth(), 10));
 
-        Loader loader = new Loader();
-        loader.setPriority(Thread.MIN_PRIORITY);
-        loader.start();
+        synchronized (children) {
+            children.addElement(this);
+        }
     }
 
-    private void loadBannerAd() {
-        System.out.println("IADView.getBannerAd()");
+    private static void loadBannerAd() {
         Hashtable metaData = new Hashtable();
+        metaData.put(IaOptionalParams.Key_Keywords,
+                "tools,gps,bluetooth,location,maps,openstreetmap");
+        metaData.put(IaOptionalParams.Key_Location, System.getProperty("microedition.locale"));
 
-        /*
-         * metaData.put(IaOptionalParams.Key_Age, "30");
-         * metaData.put(IaOptionalParams.Key_Gender, "F");
-         * metaData.put(IaOptionalParams.Key_Gps_Location,
-         * "53.542132,-2.239856"); metaData.put(IaOptionalParams.Key_Keywords,
-         * "Games"); metaData.put(IaOptionalParams.Key_Location, "US");
-         */
+        Vector ad = IADView.getBannerAdData(BTGPSRawLogMidlet.instance, "Lins_btgpsrawlog_Nokia",
+                metaData);
 
-        ad = IADView
-                .getBannerAdData(BTGPSRawLogMidlet.instance, "Lins_btgpsrawlog_Nokia", metaData);
-        Image retImg = null;
-        if (null != ad) {
-            retImg = (Image) ad.elementAt(0);
+        synchronized (children) {
+            for (int n = 0; n < children.size(); n++) {
+                ((AdForm) children.elementAt(n)).updateBannerAd(ad);
+            }
         }
-        if (retImg != null) {
-            Image.createImage(retImg);
-            imageItem.setImage(retImg);
+    }
+
+    private void updateBannerAd(Vector ad) {
+        if (null != ad) {
+            bannerImage = (Image) ad.elementAt(0);
+            bannerURL = (String) ad.elementAt(1);
+        }
+        if (bannerImage != null) {
+            Image.createImage(bannerImage);
+            imageItem.setImage(bannerImage);
         } else {
-            System.out.println("retImg is null");
+            System.out.println("img is null");
         }
     }
 }
