@@ -45,6 +45,7 @@ public class BluetoothDeviceDiscoverer implements DiscoveryListener {
     protected BTGPSRawLogMidlet midlet;
     protected UUID[]            serviceUUIDs;
     protected Vector            services  = new Vector();
+    protected int               transID   = -1;
 
     public BluetoothDeviceDiscoverer(BTGPSRawLogMidlet midlet) {
         this.midlet = midlet;
@@ -60,7 +61,19 @@ public class BluetoothDeviceDiscoverer implements DiscoveryListener {
 
     public void startInquiry(UUID[] serviceUUIDs) throws BluetoothStateException {
         this.serviceUUIDs = serviceUUIDs;
-        // TODO: Check if Bluetooth is enabled: localDevice.isPoweredOn()
+
+        this.devices.removeAllElements();
+        this.services.removeAllElements();
+
+        if (discoveryAgent != null) {
+            discoveryAgent.cancelInquiry(this);
+        }
+
+        if (transID != -1) {
+            discoveryAgent.cancelServiceSearch(transID);
+            transID = -1;
+        }
+
         LocalDevice localDevice = LocalDevice.getLocalDevice();
         discoveryAgent = localDevice.getDiscoveryAgent();
         discoveryAgent.startInquiry(DiscoveryAgent.GIAC, this);
@@ -126,7 +139,7 @@ public class BluetoothDeviceDiscoverer implements DiscoveryListener {
     public boolean select(int idx) throws BluetoothStateException {
         if (idx < this.devices.size()) {
             RemoteDevice dev = (RemoteDevice) this.devices.elementAt(idx);
-            this.discoveryAgent.searchServices(null, serviceUUIDs, dev, this);
+            transID = this.discoveryAgent.searchServices(null, serviceUUIDs, dev, this);
             return true;
         } else {
             return false;

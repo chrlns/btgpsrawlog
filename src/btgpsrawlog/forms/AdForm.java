@@ -48,8 +48,8 @@ public class AdForm extends Form {
         public void run() {
             try {
                 for (;;) {
-                    Thread.sleep(120000); // 120 seconds
                     loadBannerAd();
+                    Thread.sleep(120000); // 120 seconds
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -57,7 +57,7 @@ public class AdForm extends Form {
         }
     }
 
-    protected Command   bannerClick = new Command("Click the banner!", Command.OK, 0);
+    protected Command   bannerClick = new Command("Click!", "Click the banner!", Command.OK, 0);
     protected Image     bannerImage;
     protected String    bannerURL;
     protected ImageItem imageItem   = new ImageItem("", null, ImageItem.LAYOUT_DEFAULT, "");
