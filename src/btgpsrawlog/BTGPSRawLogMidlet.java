@@ -38,6 +38,7 @@ import btgpsrawlog.forms.SaveLogForm;
 public class BTGPSRawLogMidlet extends MIDlet {
 
     public static BTGPSRawLogMidlet instance;
+    public static final boolean     isPro = false;
 
     public static void quitApp() {
         try {

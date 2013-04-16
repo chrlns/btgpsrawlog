@@ -21,6 +21,8 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.StringItem;
 import javax.microedition.midlet.MIDlet;
 
+import btgpsrawlog.BTGPSRawLogMidlet;
+
 /**
  * Shows some information about this app.
  * 
@@ -36,6 +38,11 @@ public class AboutForm extends AdForm {
         append(new StringItem("Name", midlet.getAppProperty("MIDlet-Name")));
         append(new StringItem("Version", midlet.getAppProperty("MIDlet-Version")));
         append(new StringItem("Author", midlet.getAppProperty("MIDlet-Vendor")));
+
+        if (!BTGPSRawLogMidlet.isPro) {
+            append(new StringItem("Pro",
+                    "If you like this app, consider purchasing the ad-free PRO version!"));
+        }
 
         addCommand(BACK);
     }

@@ -65,23 +65,25 @@ public class AdForm extends Form {
     public AdForm(String title) {
         super(title);
 
-        imageItem.setDefaultCommand(bannerClick);
-        imageItem.setItemCommandListener(new ItemCommandListener() {
+        if (!BTGPSRawLogMidlet.isPro) {
+            imageItem.setDefaultCommand(bannerClick);
+            imageItem.setItemCommandListener(new ItemCommandListener() {
 
-            public void commandAction(Command cmd, Item item) {
-                try {
-                    BTGPSRawLogMidlet.instance.platformRequest(bannerURL);
-                } catch (ConnectionNotFoundException ex) {
-                    ex.printStackTrace();
+                public void commandAction(Command cmd, Item item) {
+                    try {
+                        BTGPSRawLogMidlet.instance.platformRequest(bannerURL);
+                    } catch (ConnectionNotFoundException ex) {
+                        ex.printStackTrace();
+                    }
                 }
+            });
+
+            append(imageItem);
+            append(new Spacer(getWidth(), 10));
+
+            synchronized (children) {
+                children.addElement(this);
             }
-        });
-
-        append(imageItem);
-        append(new Spacer(getWidth(), 10));
-
-        synchronized (children) {
-            children.addElement(this);
         }
     }
 
