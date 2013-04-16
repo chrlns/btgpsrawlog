@@ -39,9 +39,11 @@ public class AdForm extends Form {
     protected static Vector children = new Vector();
 
     static {
-        Loader loader = new Loader();
-        loader.setPriority(Thread.MIN_PRIORITY);
-        loader.start();
+        if (!BTGPSRawLogMidlet.isPro) {
+            Loader loader = new Loader();
+            loader.setPriority(Thread.MIN_PRIORITY);
+            loader.start();
+        }
     }
 
     static class Loader extends Thread {
@@ -55,6 +57,7 @@ public class AdForm extends Form {
                 e.printStackTrace();
             }
         }
+
     }
 
     protected Command   bannerClick = new Command("Click!", "Click the banner!", Command.OK, 0);
