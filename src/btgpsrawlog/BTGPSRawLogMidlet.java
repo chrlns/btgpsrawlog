@@ -61,7 +61,7 @@ public class BTGPSRawLogMidlet extends MIDlet {
     protected SaveLogForm                   saveLogForm = new SaveLogForm();
 
     public BTGPSRawLogMidlet() {
-        instance = this;
+        setInstance();
 
         this.eventController = new EventController(this);
         this.btDevListController = new BluetoothDeviceListController(btDevList, this);
@@ -72,6 +72,10 @@ public class BTGPSRawLogMidlet extends MIDlet {
         aboutForm.setCommandListener(eventController);
 
         this.currentDisplay = mainForm;
+    }
+
+    private synchronized void setInstance() {
+        BTGPSRawLogMidlet.instance = this;
     }
 
     public RawLogger getLogger() {

@@ -1,14 +1,14 @@
-S40 2nd Edition: not compatible, no bluetooth
-S40 3rd Edition: might work, not tested
-S40 3rd Ed. FP1: might work, not tested
-S40 3rd Ed. FP2: might work, not tested
-S40 5th Edition: assumed to work, not tested
-S40 5th Ed. FP1: compatible
+S40 3rd Ed. FP2: 
+    - Nokia 6300:  QA reports incompatible
+S40 5th Edition:      assumed to work, not tested
+S40 5th Ed. FP1:      compatible
+    - Nokia 5130:  QA reports incompatible
 S40 5th Ed. FP1 Lite: might work, not tested
 S40 5th Ed. Lite:     might work, not tested
 S40 6th Edition:      might work, not tested
 S40 6th Ed. FP1:      assumed to work, tested by Nokia QA
 S40 6th Edition Lite: might work, not tested
+    - Nokia 110:   QA reports incompatible
 S40 DP 1.0:           might work, not tested
 S40 DP 1.1:           might work, not tested
 S40 DP 2.0:           compatible
