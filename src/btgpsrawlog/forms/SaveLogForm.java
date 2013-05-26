@@ -44,8 +44,15 @@ public class SaveLogForm extends AdForm {
         append(fileName);
 
         int memCardIdx = 0;
-        Enumeration drives = FileSystemRegistry.listRoots();
-        while (drives.hasMoreElements()) {
+        Enumeration drives = null;
+        try {
+            drives = FileSystemRegistry.listRoots();
+        } catch (SecurityException ex) {
+            choiceGroup.append("SecurityException!", null);
+            ex.printStackTrace();
+        }
+
+        while (drives != null && drives.hasMoreElements()) {
             String driveString = drives.nextElement().toString();
             if (driveString.equalsIgnoreCase("c:/")) {
                 driveString = "C:/ (Phone memory)";

@@ -93,15 +93,21 @@ public class AdForm extends Form {
     private static void loadBannerAd() {
         Hashtable metaData = new Hashtable();
         metaData.put(IaOptionalParams.Key_Keywords,
-                "tools,gps,bluetooth,location,maps,openstreetmap");
-        metaData.put(IaOptionalParams.Key_Location, System.getProperty("microedition.locale"));
+                "tools,gps,bluetooth,location,maps,openstreetmap,osm,position,positioning,tracker,track");
 
-        Vector ad = IADView.getBannerAdData(BTGPSRawLogMidlet.instance, "Lins_btgpsrawlog_Nokia",
-                metaData);
+        Vector ad = null;
+        try {
+            ad = IADView.getBannerAdData(BTGPSRawLogMidlet.instance, "Lins_btgpsrawlog_Nokia",
+                    metaData);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
-        synchronized (children) {
-            for (int n = 0; n < children.size(); n++) {
-                ((AdForm) children.elementAt(n)).updateBannerAd(ad);
+        if (ad != null) {
+            synchronized (children) {
+                for (int n = 0; n < children.size(); n++) {
+                    ((AdForm) children.elementAt(n)).updateBannerAd(ad);
+                }
             }
         }
     }

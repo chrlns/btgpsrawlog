@@ -1,4 +1,5 @@
-- MIDP-2.0
-- CLDC-1.1
-- JSR 75 (File API)
-- JSR 82 (Bluetooth) 
+javax.microedition.io.Connector.file.write
+javax.microedition.io.Connector.http
+javax.microedition.io.Connector.https
+javax.microedition.io.Connector.bluetooth.client
+javax.microedition.io.Connector.file.read
