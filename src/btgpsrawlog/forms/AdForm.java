@@ -19,6 +19,8 @@
 package btgpsrawlog.forms;
 
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.microedition.io.ConnectionNotFoundException;
@@ -37,27 +39,17 @@ import btgpsrawlog.BTGPSRawLogMidlet;
 public class AdForm extends Form {
 
     protected static Vector children = new Vector();
+    protected static Timer  loader   = null;
 
-    static {
-        if (!BTGPSRawLogMidlet.isPro) {
-            Loader loader = new Loader();
-            loader.setPriority(Thread.MIN_PRIORITY);
-            loader.start();
-        }
-    }
-
-    static class Loader extends Thread {
-        public void run() {
-            try {
-                for (;;) {
+    public static void startLoader() {
+        if (!BTGPSRawLogMidlet.isPro && loader == null) {
+            loader = new Timer();
+            loader.schedule(new TimerTask() {
+                public void run() {
                     loadBannerAd();
-                    Thread.sleep(120000); // 120 seconds
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            }, 0, 120000);
         }
-
     }
 
     protected Command   bannerClick = new Command("Click!", "Click the banner!", Command.OK, 0);
@@ -81,7 +73,7 @@ public class AdForm extends Form {
                 }
             });
 
-            append(imageItem);
+            append("<Advertising>");
             append(new Spacer(getWidth(), 10));
 
             synchronized (children) {
@@ -120,6 +112,8 @@ public class AdForm extends Form {
         if (bannerImage != null) {
             Image.createImage(bannerImage);
             imageItem.setImage(bannerImage);
+            set(0, imageItem);
+            System.out.println("Banner set on " + this);
         } else {
             System.out.println("img is null");
         }

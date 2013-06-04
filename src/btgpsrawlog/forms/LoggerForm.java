@@ -22,6 +22,7 @@ import java.util.TimerTask;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Font;
+import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Spacer;
 import javax.microedition.lcdui.StringItem;
 
@@ -32,7 +33,7 @@ import btgpsrawlog.RawLogger;
  * 
  * @author Christian Lins
  */
-public class LoggerForm extends AdForm {
+public class LoggerForm extends Form {
 
     public static final Command START = new Command("Start", null, Command.OK, 0);
     public static final Command STOP  = new Command("Stop", null, Command.STOP, 0);

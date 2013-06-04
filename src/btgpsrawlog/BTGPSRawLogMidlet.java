@@ -18,6 +18,8 @@
 
 package btgpsrawlog;
 
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
@@ -25,6 +27,7 @@ import javax.microedition.midlet.MIDlet;
 import btgpsrawlog.events.BluetoothDeviceListController;
 import btgpsrawlog.events.EventController;
 import btgpsrawlog.forms.AboutForm;
+import btgpsrawlog.forms.AdForm;
 import btgpsrawlog.forms.BluetoothDeviceList;
 import btgpsrawlog.forms.LoggerForm;
 import btgpsrawlog.forms.MainForm;
@@ -52,26 +55,41 @@ public class BTGPSRawLogMidlet extends MIDlet {
     protected BluetoothDeviceListController btDevListController;
     protected Displayable                   currentDisplay;
     protected EventController               eventController;
-    protected RawLogger                     rawLogger   = null;
+    protected RawLogger                     rawLogger = null;
 
-    protected AboutForm                     aboutForm   = new AboutForm(this);
-    protected BluetoothDeviceList           btDevList   = new BluetoothDeviceList(this);
-    protected LoggerForm                    loggerForm  = new LoggerForm();
-    protected MainForm                      mainForm    = new MainForm();
-    protected SaveLogForm                   saveLogForm = new SaveLogForm();
+    protected AboutForm                     aboutForm;
+    protected BluetoothDeviceList           btDevList;
+    protected LoggerForm                    loggerForm;
+    protected MainForm                      mainForm;
+    protected SaveLogForm                   saveLogForm;
 
     public BTGPSRawLogMidlet() {
         setInstance();
+        try {
+            aboutForm = new AboutForm(this);
+            btDevList = new BluetoothDeviceList(this);
+            loggerForm = new LoggerForm();
+            mainForm = new MainForm();
+            saveLogForm = new SaveLogForm();
 
-        this.eventController = new EventController(this);
-        this.btDevListController = new BluetoothDeviceListController(btDevList, this);
-        btDevList.setCommandListener(this.btDevListController);
-        loggerForm.setCommandListener(eventController);
-        mainForm.setCommandListener(eventController);
-        saveLogForm.setCommandListener(eventController);
-        aboutForm.setCommandListener(eventController);
+            this.eventController = new EventController(this);
+            this.btDevListController = new BluetoothDeviceListController(btDevList, this);
+            btDevList.setCommandListener(this.btDevListController);
+            loggerForm.setCommandListener(eventController);
+            mainForm.setCommandListener(eventController);
+            saveLogForm.setCommandListener(eventController);
+            aboutForm.setCommandListener(eventController);
 
-        this.currentDisplay = mainForm;
+            this.currentDisplay = mainForm;
+            AdForm.startLoader();
+        } catch (Throwable t) {
+            System.gc();
+            Alert alert = new Alert("App startup error",
+                    "The following error occurred on startup: " + t.getMessage(), null,
+                    AlertType.ERROR);
+            alert.setTimeout(Alert.FOREVER);
+            this.currentDisplay = alert;
+        }
     }
 
     private synchronized void setInstance() {

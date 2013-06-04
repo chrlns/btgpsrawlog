@@ -45,12 +45,7 @@ public class SaveLogForm extends AdForm {
 
         int memCardIdx = 0;
         Enumeration drives = null;
-        try {
-            drives = FileSystemRegistry.listRoots();
-        } catch (SecurityException ex) {
-            choiceGroup.append("SecurityException!", null);
-            ex.printStackTrace();
-        }
+        drives = FileSystemRegistry.listRoots();
 
         while (drives != null && drives.hasMoreElements()) {
             String driveString = drives.nextElement().toString();
