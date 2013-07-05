@@ -39,6 +39,7 @@ public class LoggerForm extends Form {
     public static final Command STOP  = new Command("Stop", null, Command.STOP, 0);
 
     private static final String MSG   = "\nPress Start to finally start logging GPS data!";
+    private static final String MSG2  = "\nGPS device does not respond or is incompatible!\nPlease retry!";
 
     private RawLogger           logger;
     private final Timer         timer = new Timer();
@@ -74,7 +75,11 @@ public class LoggerForm extends Form {
                 int bytes = getLogger().bytesRead();
                 StringItem item;
                 if (bytes == 0) {
-                    item = new StringItem(null, MSG);
+                    if (!getLogger().isRunning()) {
+                        item = new StringItem(null, MSG);
+                    } else {
+                        item = new StringItem(null, MSG2);
+                    }
                 } else if (bytes < 10000) {
                     item = new StringItem(null, "\nData read: " + bytes + " bytes");
                 } else {

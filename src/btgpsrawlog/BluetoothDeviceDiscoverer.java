@@ -29,6 +29,7 @@ import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 import javax.bluetooth.UUID;
+import javax.microedition.lcdui.Alert;
 import javax.microedition.lcdui.Display;
 
 /**
@@ -98,15 +99,22 @@ public class BluetoothDeviceDiscoverer implements DiscoveryListener {
 
     public void serviceSearchCompleted(int transID, int respCode) {
         ServiceRecord serviceRecord = getFirstDiscoveredService();
-        String url = serviceRecord.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
-        RawLogger logger;
-        try {
-            logger = new RawLogger(url, serviceRecord.getHostDevice().getFriendlyName(false));
-            this.midlet.getLoggerForm().setLogger(logger);
-        } catch (IOException e) {
-            this.midlet.getLoggerForm().append(e.getMessage());
+        if (serviceRecord != null) {
+            String url = serviceRecord.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT,
+                    false);
+            RawLogger logger;
+            try {
+                logger = new RawLogger(url, serviceRecord.getHostDevice().getFriendlyName(false));
+                midlet.getLoggerForm().setLogger(logger);
+            } catch (IOException e) {
+                midlet.getLoggerForm().append(e.getMessage());
+            }
+            Display.getDisplay(midlet).setCurrent(midlet.getSaveLogForm());
+        } else {
+            Alert alert = new Alert("No service");
+            alert.setString("The device you selected is not compatible!");
+            Display.getDisplay(midlet).setCurrent(alert);
         }
-        Display.getDisplay(this.midlet).setCurrent(this.midlet.getSaveLogForm());
     }
 
     public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
@@ -139,7 +147,7 @@ public class BluetoothDeviceDiscoverer implements DiscoveryListener {
     public boolean select(int idx) throws BluetoothStateException {
         if (idx < this.devices.size()) {
             RemoteDevice dev = (RemoteDevice) this.devices.elementAt(idx);
-            transID = this.discoveryAgent.searchServices(null, serviceUUIDs, dev, this);
+            transID = discoveryAgent.searchServices(null, serviceUUIDs, dev, this);
             return true;
         } else {
             return false;
@@ -147,6 +155,10 @@ public class BluetoothDeviceDiscoverer implements DiscoveryListener {
     }
 
     protected ServiceRecord getFirstDiscoveredService() {
-        return (ServiceRecord) this.services.elementAt(0);
+        if (services.size() > 0) {
+            return (ServiceRecord) this.services.elementAt(0);
+        } else {
+            return null;
+        }
     }
 }

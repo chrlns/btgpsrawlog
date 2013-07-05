@@ -57,17 +57,23 @@ public class RawLogger extends Thread {
         return this.bytesRead;
     }
 
-    public synchronized void connect() throws IOException {
+    public synchronized boolean connect() throws IOException {
         connection = (StreamConnection) Connector.open(url, Connector.READ);
         inputStream = connection.openInputStream();
 
-        fileConnection = (FileConnection) Connector.open(this.saveFile);
+        fileConnection = (FileConnection) Connector.open(saveFile, Connector.READ_WRITE);
         if (fileConnection.exists()) {
-            fileConnection.delete();
+            try {
+                fileConnection.delete();
+            } catch (IOException ex) {
+                return false;
+            }
         }
         fileConnection.create();
         outputStream = fileConnection.openOutputStream();
         this.running = true;
+
+        return true;
     }
 
     private void dbgmsg(String str) {
@@ -76,16 +82,31 @@ public class RawLogger extends Thread {
         }
     }
 
-    public synchronized void disconnect() {
+    public synchronized void disconnect() throws IOException {
         this.running = false;
+
+        inputStream.close();
+        connection.close();
+
+        outputStream.flush();
+        outputStream.close();
+        fileConnection.close();
     }
 
     public String getDeviceName() {
-        return this.name;
+        return name;
+    }
+
+    public String getSaveFile() {
+        return saveFile;
     }
 
     public String getURL() {
-        return this.url;
+        return url;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 
     public void run() {
@@ -93,7 +114,7 @@ public class RawLogger extends Thread {
         try {
             byte[] buf = new byte[128];
             while (running) {
-                int read = this.inputStream.read(buf);
+                int read = inputStream.read(buf);
                 if (read == -1) {
                     dbgmsg("End of stream.");
                     break;
@@ -107,17 +128,20 @@ public class RawLogger extends Thread {
             try {
                 inputStream.close();
             } catch (Exception ex) {
+                dbgmsg("Exception catched: " + ex.toString());
             }
             try {
                 connection.close();
             } catch (Exception ex) {
-                dbgmsg("Exception catched: " + ex.getMessage());
+                dbgmsg("Exception catched: " + ex.toString());
                 ex.printStackTrace();
             }
             try {
+                outputStream.flush();
+                outputStream.close();
                 fileConnection.close();
             } catch (Exception ex) {
-                dbgmsg("Exception catched: " + ex.getMessage());
+                dbgmsg("Exception catched: " + ex.toString());
                 ex.printStackTrace();
             }
         } catch (Exception ex) {
