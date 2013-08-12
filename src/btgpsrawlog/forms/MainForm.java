@@ -18,7 +18,6 @@
 package btgpsrawlog.forms;
 
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.Spacer;
 
 /**
@@ -26,22 +25,28 @@ import javax.microedition.lcdui.Spacer;
  * 
  * @author Christian Lins
  */
-public class MainForm extends Form {
+public class MainForm extends AdForm {
 
     public static final Command EXIT  = new Command("Exit", "Exit app", Command.EXIT, 0);
     public static final Command START = new Command("Continue", "Continue with device discovery",
                                               Command.OK, 1);
     public static final Command ABOUT = new Command("About", null, Command.HELP, 0);
 
-    private static final String MSG   = "Press Continue to select a bluetooth GPS device, "
+    private static final String MSG0  = "Bluetooth GPS Logger is an app that can save the "
+                                              + "raw output of an external GPS device (GPS mouse) "
+                                              + "to your phone's storage.";
+
+    private static final String MSG1  = "Please continue and select a bluetooth GPS device, "
                                               + "choose a location to save the NMEA log and "
                                               + "start walking around to collect data!";
 
     public MainForm() {
-        super("Bluetooth GPS Logger");
+        super("BT GPS Logger");
+
+        append(MSG0);
 
         append(new Spacer(getWidth(), 10));
-        append(MSG);
+        append(MSG1);
 
         addCommand(EXIT);
         addCommand(START);

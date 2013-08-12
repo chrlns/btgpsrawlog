@@ -1,0 +1,2 @@
+http://m2m1.inner-active.mobi/simpleM2M/
+http://cdn1.inner-active.mobi/

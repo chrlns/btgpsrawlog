@@ -22,7 +22,6 @@ import java.util.Enumeration;
 import javax.microedition.io.file.FileSystemRegistry;
 import javax.microedition.lcdui.ChoiceGroup;
 import javax.microedition.lcdui.Command;
-import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.TextField;
 
 /**
@@ -30,7 +29,7 @@ import javax.microedition.lcdui.TextField;
  * 
  * @author Christian Lins
  */
-public class SaveLogForm extends Form {
+public class SaveLogForm extends AdForm {
 
     public static final Command BACK        = new Command("Back", Command.BACK, 0);
     public static final Command OK          = new Command("Continue", Command.OK, 1);
@@ -40,13 +39,15 @@ public class SaveLogForm extends Form {
     private final TextField     fileName    = new TextField("File name", "nmea.txt", 64, 0);
 
     public SaveLogForm() {
-        super("Choose save location");
+        super("Save where?");
 
         append(fileName);
 
         int memCardIdx = 0;
-        Enumeration drives = FileSystemRegistry.listRoots();
-        while (drives.hasMoreElements()) {
+        Enumeration drives = null;
+        drives = FileSystemRegistry.listRoots();
+
+        while (drives != null && drives.hasMoreElements()) {
             String driveString = drives.nextElement().toString();
             if (driveString.equalsIgnoreCase("c:/")) {
                 driveString = "C:/ (Phone memory)";

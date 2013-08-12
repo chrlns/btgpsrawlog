@@ -91,22 +91,20 @@ public class BluetoothDeviceListController implements CommandListener, Discovery
     }
 
     public void inquiryCompleted(int discType) {
-        if (this.bluetoothDeviceDiscoverer.hasDevices()) {
-            this.bluetoothDeviceList.delete(0);
+        if (bluetoothDeviceDiscoverer.hasDevices() && bluetoothDeviceList.size() > 0) {
+            bluetoothDeviceList.delete(0);
         } else {
-            this.bluetoothDeviceList.deleteAll();
-            this.bluetoothDeviceList.append("No devices found!", null);
+            bluetoothDeviceList.deleteAll();
+            bluetoothDeviceList.append("No devices found!", null);
         }
     }
 
     public void serviceSearchCompleted(int transID, int respCode) {
-        // TODO Auto-generated method stub
-
+        // Do nothing, handled in BluetoothDeviceDiscoverer
     }
 
     public void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
-        // TODO Auto-generated method stub
-
+        // Do nothing, handled in BluetoothDeviceDiscoverer
     }
 
 }

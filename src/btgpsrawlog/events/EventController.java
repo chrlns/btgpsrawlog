@@ -42,20 +42,26 @@ public class EventController implements CommandListener {
     }
 
     public void commandAction(Command cmd, Displayable disp) {
-        if (disp.equals(this.midlet.getLoggerForm())) {
-            if (cmd.equals(LoggerForm.START)) {
-                try {
-                    LoggerForm loggerForm = this.midlet.getLoggerForm();
-                    loggerForm.removeCommand(LoggerForm.START);
-                    loggerForm.getLogger().connect();
+        if (disp.equals(midlet.getLoggerForm())) {
+            LoggerForm loggerForm = midlet.getLoggerForm();
+            try {
+                if (cmd.equals(LoggerForm.START)) {
+                    if (!loggerForm.getLogger().connect()) {
+                        loggerForm.append(loggerForm.getLogger().getSaveFile()
+                                + " is in use. Please select another file!");
+                        return;
+                    }
                     loggerForm.getLogger().start();
+                    loggerForm.removeCommand(LoggerForm.START);
                     loggerForm.addCommand(LoggerForm.STOP);
-                } catch (Exception ex) {
-                    this.midlet.getLoggerForm().append(ex.getMessage());
+                } else if (cmd.equals(LoggerForm.STOP)) {
+                    loggerForm.getLogger().disconnect();
+                    loggerForm.removeCommand(LoggerForm.STOP);
+                    loggerForm.addCommand(LoggerForm.START);
+                    midlet.showMainForm();
                 }
-            } else if (cmd.equals(LoggerForm.STOP)) {
-                this.midlet.getLoggerForm().getLogger().disconnect();
-                this.midlet.showMainForm();
+            } catch (Exception ex) {
+                loggerForm.append("EventController.commandAction(): " + ex.toString());
             }
         } else if (disp.equals(this.midlet.getMainForm())) {
             try {
